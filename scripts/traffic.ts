@@ -2,7 +2,7 @@ const BASE_URL = "http://localhost:3000";
 const RANDOM_SEED = 1;
 const REQUEST_INTERVAL_MS = 500;
 const MIN_DOLLARS = 20;
-const MAX_DOLLARS = 400;
+const MAX_DOLLARS = 150;
 
 const CUSTOMER_IDS = [
   "V-14582093",
@@ -189,6 +189,22 @@ while (Date.now() < deadline) {
   }
 
   const today = caracasToday(new Date());
+  const payEarly = rng() < 0.5;
+  if (payEarly) {
+    const futureUnpaid = openInstallments.filter(
+      (installment) => !installment.paid && installment.dueDate > today,
+    );
+    if (futureUnpaid.length > 0) {
+      const installment = pick(rng, futureUnpaid);
+      const payment = await send("/payments", {
+        installment_id: installment.installmentId,
+        paid_at: new Date().toISOString(),
+      });
+      if (payment === null) break;
+      if (payment.status === 200) installment.paid = true;
+    }
+  }
+
   for (const installment of openInstallments) {
     if (installment.paid || installment.dueDate !== today) continue;
     const payment = await send("/payments", {
