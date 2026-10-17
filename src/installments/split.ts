@@ -9,15 +9,11 @@ export class InstallmentSumMismatchError extends Error {
   }
 }
 
-/** base = floor(total / n); the first installment also receives total − base × n. */
+/** Each installment is an equal share of the total, rounded to the nearest cent. */
 export function splitInstallments(totalCents: number, planId: PlanId): number[] {
   const count = PLANS[planId].payments;
-  const base = Math.floor(totalCents / count);
-  const remainder = totalCents - base * count;
-  const amounts: number[] = [];
-  for (let index = 0; index < count; index += 1) {
-    amounts.push(index === 0 ? base + remainder : base);
-  }
+  const share = Math.round(totalCents / count);
+  const amounts = Array.from({ length: count }, () => share);
 
   let sum = 0;
   for (const amount of amounts) sum += amount;
