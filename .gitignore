@@ -1,3 +1,4 @@
 node_modules/
 logs/
 .cursor/hooks/last-input.log
+.env
