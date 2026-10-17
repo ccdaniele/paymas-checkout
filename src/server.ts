@@ -2,6 +2,7 @@ import { pathToFileURL } from "node:url";
 import Fastify from "fastify";
 import { createStore, type Store } from "./data/store.js";
 import { logger, version } from "./logger.js";
+import { registerPurchaseRoutes } from "./purchases/routes.js";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -20,6 +21,8 @@ export function buildServer() {
   app.get("/health", async () => {
     return { status: "ok" as const, version };
   });
+
+  registerPurchaseRoutes(app);
 
   return app;
 }
