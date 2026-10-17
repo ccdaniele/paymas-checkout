@@ -49,7 +49,11 @@ export function registerPurchaseRoutes(app: App): void {
       return reply.code(201).send(purchase);
     } catch (error) {
       const errorCode = failureCode(error);
-      log("error", "purchase_failed", { ...fields, error_code: errorCode });
+      if (errorCode === "INSUFFICIENT_CREDIT") {
+        log("info", "purchase_declined", { ...fields, error_code: errorCode });
+      } else {
+        log("error", "purchase_failed", { ...fields, error_code: errorCode });
+      }
       return reply.code(failureStatus(errorCode)).send({ error_code: errorCode });
     }
   });

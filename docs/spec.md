@@ -40,7 +40,8 @@ customer_name, merchant_id, plan, amount_cents, error_code.
 |---|---|---|
 | credit_check_completed | info | after /credit-check |
 | purchase_created | info | purchase stored |
-| purchase_failed | error | any purchase error (with error_code) |
+| purchase_declined | info | purchase rejected for insufficient credit |
+| purchase_failed | error | unexpected purchase error (500) |
 | payment_recorded | info | payment stored (with on_time) |
 | marked_delinquent | warn | customer becomes delinquent |
 
