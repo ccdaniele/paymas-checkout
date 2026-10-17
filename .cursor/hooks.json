@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": ".cursor/hooks/protect-paths.sh",
+        "matcher": "Write",
+        "failClosed": true
+      }
+    ]
+  }
+}
