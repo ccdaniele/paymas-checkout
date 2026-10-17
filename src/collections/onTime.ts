@@ -1,6 +1,6 @@
-import { caracasDate } from "../installments/schedule.js";
+import { utcCalendarDate } from "./calendarDate.js";
 
-/** On time when paid_at's America/Caracas calendar date is on or before due_date. */
+/** On time when paid_at's UTC calendar date is on or before due_date. */
 export function isPaymentOnTime(dueDate: string, paidAt: Date): boolean {
-  return caracasDate(paidAt) <= dueDate;
+  return utcCalendarDate(paidAt) <= dueDate;
 }
