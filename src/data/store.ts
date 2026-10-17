@@ -4,6 +4,7 @@ export type Customer = {
   id: string;
   name: string;
   creditLimitCents: number;
+  delinquent: boolean;
 };
 
 export type Merchant = {
@@ -28,6 +29,7 @@ export type Installment = {
   amountCents: number;
   dueDate: string;
   paid: boolean;
+  paidAt: string | null;
 };
 
 export type Store = {
@@ -39,7 +41,9 @@ export type Store = {
 
 export function createStore(): Store {
   return {
-    customers: new Map(seedCustomers.map((customer) => [customer.id, { ...customer }])),
+    customers: new Map(
+      seedCustomers.map((customer) => [customer.id, { ...customer, delinquent: false }]),
+    ),
     merchants: new Map(seedMerchants.map((merchant) => [merchant.id, { ...merchant }])),
     purchases: new Map(),
     installments: new Map(),

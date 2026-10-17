@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { availableCents } from "../credit/decision.js";
 import type { Store } from "../data/store.js";
 import { isPlanId, type PlanId } from "../installments/plans.js";
 import { scheduleInstallments } from "../installments/schedule.js";
@@ -38,18 +39,6 @@ export function parsePurchaseBody(body: unknown): PurchaseInput {
   return { customer_id, merchant_id, amount_cents, plan };
 }
 
-export function availableCents(store: Store, customerId: string): number {
-  const customer = store.customers.get(customerId);
-  if (customer === undefined) return 0;
-  let unpaid = 0;
-  for (const installment of store.installments.values()) {
-    if (installment.customerId === customerId && !installment.paid) {
-      unpaid += installment.amountCents;
-    }
-  }
-  return customer.creditLimitCents - unpaid;
-}
-
 export function createPurchase(store: Store, input: PurchaseInput, purchasedAt = new Date()): PurchaseResponse {
   const customer = store.customers.get(input.customer_id);
   const merchant = store.merchants.get(input.merchant_id);
@@ -69,6 +58,7 @@ export function createPurchase(store: Store, input: PurchaseInput, purchasedAt =
     amountCents: installment.amountCents,
     dueDate: installment.dueDate,
     paid: false,
+    paidAt: null,
   }));
 
   store.purchases.set(purchaseId, {

@@ -1,10 +1,12 @@
 import type { Customer, Merchant } from "./store.js";
 
+type SeedCustomer = Omit<Customer, "delinquent">;
+
 /**
  * Deterministic seed. Customer 1 is fixed by the spec.
  * Other credit limits are whole dollars in the 200–1,000 range, stored as cents.
  */
-export const customers: readonly Customer[] = [
+export const customers: readonly SeedCustomer[] = [
   { id: "V-14582093", name: "María Fernández", creditLimitCents: 50_000 },
   { id: "V-18273645", name: "Carlos Rodríguez", creditLimitCents: 20_000 },
   { id: "V-19827364", name: "Ana Martínez", creditLimitCents: 35_000 },
