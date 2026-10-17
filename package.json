@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "tsx src/server.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "traffic": "tsx scripts/traffic.ts"
   },
   "dependencies": {
     "fastify": "^5.6.2",
