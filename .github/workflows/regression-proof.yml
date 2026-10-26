@@ -1,0 +1,62 @@
+name: regression-proof
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  regression-proof:
+    if: startsWith(github.head_ref, 'cursor/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Find changed test files
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git diff --name-only --diff-filter=ACMR origin/main...HEAD \
+            | grep '\.test\.ts$' > /tmp/regression-tests-list.txt || true
+          if [ ! -s /tmp/regression-tests-list.txt ]; then
+            echo "Fix PRs must include a regression test."
+            exit 1
+          fi
+          mkdir -p /tmp/regression-tests
+          while IFS= read -r f; do
+            mkdir -p "/tmp/regression-tests/$(dirname "$f")"
+            cp "$f" "/tmp/regression-tests/$f"
+            echo "Stashed $f"
+          done < /tmp/regression-tests-list.txt
+
+      - name: Check out origin/main and restore regression tests
+        run: |
+          set -euo pipefail
+          git checkout --force origin/main
+          while IFS= read -r f; do
+            mkdir -p "$(dirname "$f")"
+            cp "/tmp/regression-tests/$f" "$f"
+            echo "Restored $f onto main"
+          done < /tmp/regression-tests-list.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci
+
+      - name: Run regression tests on main
+        run: |
+          set -euo pipefail
+          mapfile -t files < /tmp/regression-tests-list.txt
+          set +e
+          npx vitest run "${files[@]}"
+          status=$?
+          set -e
+          if [ "$status" -eq 0 ]; then
+            echo "Regression test passes on main — it does not catch the bug."
+            exit 1
+          fi
+          echo "Regression test fails on main as expected"
