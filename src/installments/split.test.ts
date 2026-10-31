@@ -12,3 +12,9 @@ it("$100 on 4x28", () => {
 it("$90 on 3x10", () => {
   expect(splitInstallments(9_000, "3x10")).toEqual([3_000, 3_000, 3_000]);
 });
+
+it("3x10 splits uneven totals with remainder on the first installment (INC-677642)", () => {
+  expect(splitInstallments(14_800, "3x10")).toEqual([4_934, 4_933, 4_933]);
+  expect(splitInstallments(5_200, "3x10")).toEqual([1_734, 1_733, 1_733]);
+  expect(splitInstallments(13_900, "3x10")).toEqual([4_634, 4_633, 4_633]);
+});
